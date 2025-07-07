@@ -1,16 +1,5 @@
 # launcher_reset
 
-A new Flutter project.
-
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+While using Nova launcher on Android, sometimes clicking the recent apps button do nothing.
+This can be fixed by manually force stopping the stock Android launcher.
+But it is tedious to do it everytimes so I wrote an app that use root permission to kill it from homescreen widget.
