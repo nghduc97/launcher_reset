@@ -6,6 +6,7 @@ import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.Intent
 import android.widget.RemoteViews
+import android.widget.Toast
 import io.flutter.Log
 import java.util.concurrent.TimeUnit
 
@@ -37,25 +38,26 @@ class OneTapWidget : AppWidgetProvider() {
     override fun onReceive(context: Context?, intent: Intent?) {
         if (intent?.action == WIDGET_KILL_LAUNCHER_INTENT) {
             try {
-                val psProc = ProcessBuilder("su", "-c", "ps").start();
+                val psProc = ProcessBuilder("su", "-c", "ps -o pid,cmd").start();
                 psProc.waitFor(10, TimeUnit.SECONDS);
                 val psOut = psProc.inputStream.bufferedReader().use { it.readText() }
                 val lines = psOut.split("\n")
 
                 val spaceRegex = Regex("\\s+")
-                val pidCol = lines[0].split(spaceRegex)
-                    .indexOfFirst { it.lowercase() == "pid" }
-
                 var foundPid = "";
                 for (line in lines) {
-                    if (line.contains("com.android.launcher3")) {
-                        val parts = line.split(spaceRegex)
-                        foundPid = parts[pidCol]
-                        Log.i("PidLookup", "name=${parts[parts.size - 1]} pid=${foundPid}")
+                    if (line.endsWith("oid.launcher3")) {
+                        val parts = line.split(spaceRegex, limit = 2)
+                        foundPid = parts[0];
+                        Log.i("PidLookup", "name=${parts[1]} pid=${foundPid}")
                         break
                     }
                 }
 
+                Log.i("WidgetClick", psOut)
+                if (foundPid.isEmpty()) {
+                    throw RuntimeException("process not found")
+                }
                 val killProc = ProcessBuilder("su", "-c", "kill $foundPid").start()
                 killProc.waitFor(10, TimeUnit.SECONDS)
             } catch (ex: Exception) {
